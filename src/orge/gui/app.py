@@ -64,6 +64,10 @@ class OrgeGUI(tk.Tk):
         self._build_layout()
         self._poll_task_queue()
 
+    def _init_ui(self):
+        """Compatibility helper for UI layout construction."""
+        self._build_layout()
+
     def _setup_styles(self):
         self.style = ttk.Style(self)
         try:
