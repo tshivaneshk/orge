@@ -1,8 +1,8 @@
 ; Inno Setup Script for ORGE
-; Creates a professional Windows installer: ORGE-Setup-2.1.0.exe
+; Creates a professional Windows installer: ORGE-Setup-2.2.0.exe
 
 #define MyAppName "ORGE"
-#define MyAppVersion "2.1.0"
+#define MyAppVersion "2.2.0"
 #define MyAppPublisher "ORGE Contributors"
 #define MyAppURL "https://github.com/tshivaneshk/orge"
 #define MyAppExeName "ORGE.exe"

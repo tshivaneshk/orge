@@ -19,12 +19,12 @@ Both the GUI and CLI share the exact same deterministic ORGE core engine: scanni
 Non-technical users can install and use ORGE immediately without Python, PowerShell, or terminals.
 
 ### 1. Windows Installer
-1. Download **`ORGE-Setup-2.1.0.exe`** from [Releases](https://github.com/tshivaneshk/orge/releases).
+1. Download **`ORGE-Setup-2.2.0.exe`** from [Releases](https://github.com/tshivaneshk/orge/releases).
 2. Run the installer. It installs the application, adds an **ORGE** Start Menu shortcut, and registers `orge` in your system PATH.
 3. Launch ORGE from your Start Menu to open the GUI.
 
 ### 2. Windows Portable Package
-1. Download **`ORGE-Portable-2.1.0.zip`**.
+1. Download **`ORGE-Portable-2.2.0.zip`**.
 2. Extract the archive anywhere on your PC.
 3. Double-click **`ORGE.exe`** to launch the GUI (runs with no console window).
 4. Power users can run **`orge.exe`** directly from any terminal.
@@ -36,13 +36,13 @@ Non-technical users can install and use ORGE immediately without Python, PowerSh
 Standalone CLI distributions are provided with zero Python dependency required:
 
 ### Linux
-1. Download `orge-2.1.0-linux-x64.tar.gz` from [Releases](https://github.com/tshivaneshk/orge/releases).
-2. Extract: `tar -xzf orge-2.1.0-linux-x64.tar.gz`
+1. Download `orge-2.2.0-linux-x64.tar.gz` from [Releases](https://github.com/tshivaneshk/orge/releases).
+2. Extract: `tar -xzf orge-2.2.0-linux-x64.tar.gz`
 3. Run: `./orge --help` or `./orge organize /path/to/folder`
 
 ### macOS
-1. Download `orge-2.1.0-macos.tar.gz` from [Releases](https://github.com/tshivaneshk/orge/releases).
-2. Extract: `tar -xzf orge-2.1.0-macos.tar.gz`
+1. Download `orge-2.2.0-macos.tar.gz` from [Releases](https://github.com/tshivaneshk/orge/releases).
+2. Extract: `tar -xzf orge-2.2.0-macos.tar.gz`
 3. Run: `./orge --help` or `./orge organize /path/to/folder`
 
 ---
@@ -71,9 +71,11 @@ Launch the graphical user interface by running:
 orge gui
 ```
 Features:
-- Select target directory with visual folder picker.
-- Live scan & preview displaying categorized file trees.
-- Safety error reporting before any disk modifications.
+- Modern PySide6 desktop GUI with native Windows look & feel (no console window).
+- Light, Dark, and System theme support with persistence.
+- Fast multi-threaded scanning and non-blocking background workers.
+- Visual folder picker, interactive preview tree, and in-memory search.
+- Pre-execution safety validation preventing system path tampering.
 - Interactive run history browser and one-click undo rollback.
 
 ---

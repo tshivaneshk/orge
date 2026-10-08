@@ -5,6 +5,22 @@ All notable changes to **ORGE** will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-10-09
+
+### Added
+- Complete modern PySide6 desktop GUI with custom card styling, High-DPI support, and official ORGE branding.
+- Light, Dark, and System theme support with instant switching and configuration persistence.
+- Floating bottom navigation with Home, Review, History, and Settings tabs.
+- Performance-first background worker pipeline with generation-token safety against stale scan/organize jobs.
+- High-performance directory scanning with `os.scandir()`, cached safety constraints, and throttled UI updates.
+- In-memory history caching and immediate history table refresh after organization.
+- Dedicated standalone Windows GUI executable (`ORGE.exe`, PE subsystem 2) and companion CLI executable (`orge.exe`, PE subsystem 3).
+
+### Fixed
+- Fixed Home to Review transition workflow state and reset upon successful organization.
+- Fixed settings dropdown and undo retention persistence across application restarts.
+- Guarded GUI imports on headless environments and non-Windows runners without display servers.
+
 ## [2.1.0] - 2026-10-08
 
 ### Added

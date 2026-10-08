@@ -11,8 +11,8 @@ Capabilities:
 6. Validates binary integrity:
    - ORGE.exe must exist and have PE Subsystem == 2 (Windows GUI, no console)
    - orge.exe must exist and have PE Subsystem == 3 (Windows CUI, console)
-7. Generates Portable Zip package (`dist/ORGE-Portable-2.1.0.zip`).
-8. Compiles Inno Setup installer (`ORGE-Setup-2.1.0.exe`) if Inno Setup compiler is found.
+7. Generates Portable Zip package (`dist/ORGE-Portable-2.2.0.zip`).
+8. Compiles Inno Setup installer (`ORGE-Setup-2.2.0.exe`) if Inno Setup compiler is found.
 9. Creates Linux & macOS standalone CLI tarballs if running on those platforms.
 """
 
@@ -39,7 +39,7 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 DIST_DIR = ROOT_DIR / "dist"
 BUILD_DIR = ROOT_DIR / "build"
 INSTALLER_DIR = ROOT_DIR / "dist-installer"
-VERSION = "2.1.0"
+VERSION = "2.2.0"
 
 def log(msg: str):
     print(f"\n[ORGE BUILD] {msg}", flush=True)
