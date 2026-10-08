@@ -55,8 +55,9 @@ jobs:
         shell: pwsh
         run: |
           python -m PyInstaller --clean --noconfirm --onedir --noconsole --name ORGE --paths src src/orge/gui/__main__.py
-          python -m PyInstaller --clean --noconfirm --onedir --console --name orge-cli --paths src src/orge/__main__.py
-          Copy-Item dist/orge-cli/orge-cli.exe dist/ORGE/orge.exe -Force
+          python -m PyInstaller --clean --noconfirm --onefile --console --name orge --paths src src/orge/__main__.py
+          Copy-Item dist/orge.exe dist/ORGE/orge.exe -Force
+          Copy-Item dist/orge.exe dist/ORGE/orge-cli.exe -Force
 
       - name: Create Portable Zip
         shell: pwsh
