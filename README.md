@@ -1,36 +1,55 @@
-# ORGE — Open Resource & Good Organization Engine
+# ORGE
 
 [![CI](https://github.com/tshivaneshk/orge/actions/workflows/ci.yml/badge.svg)](https://github.com/tshivaneshk/orge/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python: 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 
-**ORGE** is a modern, high-safety, cross-platform file organization engine and desktop application. Built from the ground up for deterministic execution, ORGE classifies, stages, validates, and reorganizes filesystem directories with complete rollback capability.
+**ORGE** is a professional, safe, open-source desktop file organization application and CLI utility.
 
-> *Historical Note: ORGE evolved from the original dirtx prototype.*
+- **Windows**: Flagship Modern GUI (`ORGE.exe`) + Companion CLI (`orge.exe`)
+- **Linux**: Standalone CLI (`orge`)
+- **macOS**: Standalone CLI (`orge`)
+
+Both the GUI and CLI share the exact same deterministic ORGE core engine: scanning, intelligent categorization, collision prevention, safety constraints, and full rollback capability.
 
 ---
 
-## User Installation (No Python Required)
+## Windows Installation (Recommended)
 
-End users do not need Python installed to use ORGE. Standalone executables, desktop bundles, and installers are provided for all major operating systems.
+Non-technical users can install and use ORGE immediately without Python, PowerShell, or terminals.
 
-### Windows
-- **Installer**: Download `ORGE-Setup-2.1.0.exe` from [Releases](https://github.com/tshivaneshk/orge/releases). Installs `ORGE.exe` (windowed GUI without any console shell), creates Start Menu / Desktop shortcuts, and registers `orge.exe` (CLI) in your system PATH.
-- **Portable**: Download and extract `ORGE-Portable-2.1.0.zip`. Run `ORGE.exe` for the GUI or run `orge.exe` from any terminal.
+### 1. Windows Installer
+1. Download **`ORGE-Setup-2.1.0.exe`** from [Releases](https://github.com/tshivaneshk/orge/releases).
+2. Run the installer. It installs the application, adds an **ORGE** Start Menu shortcut, and registers `orge` in your system PATH.
+3. Launch ORGE from your Start Menu to open the GUI.
+
+### 2. Windows Portable Package
+1. Download **`ORGE-Portable-2.1.0.zip`**.
+2. Extract the archive anywhere on your PC.
+3. Double-click **`ORGE.exe`** to launch the GUI (runs with no console window).
+4. Power users can run **`orge.exe`** directly from any terminal.
+
+---
+
+## Linux & macOS (CLI Only)
+
+Standalone CLI distributions are provided with zero Python dependency required:
 
 ### Linux
-- Download `orge-2.1.0-linux-x64.tar.gz` from [Releases](https://github.com/tshivaneshk/orge/releases).
-- Extract and run `./orge gui` or `./orge --help`.
+1. Download `orge-2.1.0-linux-x64.tar.gz` from [Releases](https://github.com/tshivaneshk/orge/releases).
+2. Extract: `tar -xzf orge-2.1.0-linux-x64.tar.gz`
+3. Run: `./orge --help` or `./orge organize /path/to/folder`
 
 ### macOS
-- Download `orge-2.1.0-macos.tar.gz` from [Releases](https://github.com/tshivaneshk/orge/releases).
-- Extract and launch `./orge gui` or `./orge --help`.
+1. Download `orge-2.1.0-macos.tar.gz` from [Releases](https://github.com/tshivaneshk/orge/releases).
+2. Extract: `tar -xzf orge-2.1.0-macos.tar.gz`
+3. Run: `./orge --help` or `./orge organize /path/to/folder`
 
 ---
 
-## Developer Installation (Python Package)
+## Python Package (Developers & Power Users)
 
-Developers and power users can install ORGE directly via pip:
+If you have Python 3.10+ installed, you can also install ORGE via `pip`:
 
 ```bash
 pip install orge

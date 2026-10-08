@@ -18,34 +18,49 @@ Pipeline:
   Permission validation
         |
   Plan approved
+
+Optimized for high throughput on large file sets with cached permission checks.
 """
 from pathlib import Path
 import os
 import sys
-from typing import Set
+from typing import Set, Dict
 from orge.core.models import OperationPlan, ValidationReport, ValidationIssue, ActionType
 from orge.planner.engine import is_reparse_point_or_symlink
+from orge.core.paths import get_runtime_protected_paths
 
 def get_system_protected_paths() -> Set[Path]:
-    """Returns absolute paths of system-critical operating system directories."""
+    """Returns absolute paths of system-critical operating system directories and ORGE runtime."""
     paths = set()
     if sys.platform == "win32":
         # Windows System Roots
         for var in ["SystemRoot", "windir", "ProgramFiles", "ProgramFiles(x86)", "ProgramData"]:
             val = os.environ.get(var)
             if val:
-                paths.add(Path(val).resolve())
+                try:
+                    paths.add(Path(val).resolve())
+                except Exception:
+                    pass
         # Drive roots like C:\, D:\
         for drive in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
             p = Path(f"{drive}:\\")
             if p.exists():
-                paths.add(p.resolve())
+                try:
+                    paths.add(p.resolve())
+                except Exception:
+                    pass
     else:
         # POSIX System Roots
         for posix_dir in ["/", "/bin", "/sbin", "/usr", "/usr/bin", "/etc", "/var", "/boot", "/sys", "/proc", "/dev", "/root"]:
             p = Path(posix_dir)
             if p.exists():
-                paths.add(p.resolve())
+                try:
+                    paths.add(p.resolve())
+                except Exception:
+                    pass
+
+    # Add ORGE installation and runtime paths
+    paths.update(get_runtime_protected_paths())
     return paths
 
 class SafetyValidator:
@@ -87,11 +102,12 @@ class SafetyValidator:
                 message=f"Target directory is not writable: {target_root}"
             ))
 
-        seen_destinations = set()
+        seen_destinations: Set[Path] = set()
+        checked_writable_parents: Dict[Path, bool] = {}
 
         for step in plan.executable_steps:
-            src = step.source_path.resolve()
-            dst = step.target_path.resolve()
+            src = step.source_path
+            dst = step.target_path
 
             # 3. Source Validation
             if not src.exists():
@@ -105,6 +121,7 @@ class SafetyValidator:
 
             # 4. Destination Containment Validation (Prevent Path Traversal)
             try:
+                # Fast check: target_root in dst.parents or dst.relative_to
                 dst.relative_to(target_root)
             except ValueError:
                 report.issues.append(ValidationIssue(
@@ -142,9 +159,22 @@ class SafetyValidator:
                     message=f"Target destination already exists on disk: {dst}"
                 ))
 
-            # 8. Permission Validation on Destination Parent
+            # 8. Permission Validation on Destination Parent (Cached per category parent)
             dst_parent = dst.parent
-            if dst_parent.exists() and not os.access(dst_parent, os.W_OK):
+            if dst_parent not in checked_writable_parents:
+                if dst_parent.exists():
+                    is_writable = os.access(dst_parent, os.W_OK)
+                    checked_writable_parents[dst_parent] = is_writable
+                    if not is_writable:
+                        report.issues.append(ValidationIssue(
+                            severity="ERROR",
+                            source_path=src,
+                            target_path=dst,
+                            message=f"Destination directory parent is not writable: {dst_parent}"
+                        ))
+                else:
+                    checked_writable_parents[dst_parent] = True
+            elif not checked_writable_parents[dst_parent]:
                 report.issues.append(ValidationIssue(
                     severity="ERROR",
                     source_path=src,

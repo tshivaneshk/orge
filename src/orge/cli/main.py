@@ -59,7 +59,7 @@ def create_parser() -> argparse.ArgumentParser:
 
     # Command: organize
     p_org = subparsers.add_parser("organize", parents=[parent_parser], help="Organize files in the target directory")
-    p_org.add_argument("path", nargs="?", default=".", help="Target folder (default: current directory)")
+    p_org.add_argument("path", help="Target folder to organize")
     p_org.add_argument("-d", "--days", type=int, default=0, help="Only move files older than N days")
     p_org.add_argument("-r", "--recursive", action="store_true", help="Recursively scan subfolders")
     p_org.add_argument("--dry-run", action="store_true", help="Preview plan without executing moves")
@@ -67,13 +67,13 @@ def create_parser() -> argparse.ArgumentParser:
 
     # Command: preview
     p_prev = subparsers.add_parser("preview", parents=[parent_parser], help="Preview organization plan without moving files")
-    p_prev.add_argument("path", nargs="?", default=".", help="Target folder")
+    p_prev.add_argument("path", help="Target folder to preview")
     p_prev.add_argument("-d", "--days", type=int, default=0, help="Only move files older than N days")
     p_prev.add_argument("-r", "--recursive", action="store_true", help="Recursively scan subfolders")
 
     # Command: scan
     p_scan = subparsers.add_parser("scan", parents=[parent_parser], help="Scan and inspect directory file statistics and categories")
-    p_scan.add_argument("path", nargs="?", default=".", help="Target folder")
+    p_scan.add_argument("path", help="Target folder to scan")
     p_scan.add_argument("-r", "--recursive", action="store_true", help="Recursively scan subfolders")
 
     # Command: undo
@@ -139,7 +139,18 @@ def main(args: Optional[list] = None) -> int:
 
     # Resolve Command & Arguments
     command = parsed.command
-    folder_str = getattr(parsed, "path", None) or parsed.folder or "."
+
+    # If no command and no legacy folder flag was passed, display help and exit safely
+    if not command and not parsed.folder:
+        parser.print_help()
+        return 0
+
+    folder_str = getattr(parsed, "path", None) or parsed.folder
+    if not folder_str:
+        ui.error("A target directory must be explicitly specified.")
+        parser.print_usage()
+        return 1
+
     days = getattr(parsed, "days", 0)
     recursive = getattr(parsed, "recursive", False)
     dry_run = getattr(parsed, "dry_run", False) or (command == "preview")
@@ -148,7 +159,7 @@ def main(args: Optional[list] = None) -> int:
     if command == "scan":
         return cmd_scan(planner, folder_str, recursive, ui, parsed.json)
 
-    # Default to organize command
+    # Organize command (or legacy folder execution)
     return cmd_organize(
         planner=planner,
         validator=validator,

@@ -31,7 +31,8 @@ DEFAULT_CATEGORIES: Dict[str, List[str]] = {
 
 DEFAULT_IGNORED: List[str] = [
     ".git", ".svn", ".hg", ".orge", ".venv", "venv", "node_modules",
-    "__pycache__", ".DS_Store", "Thumbs.db", "desktop.ini"
+    "__pycache__", ".DS_Store", "Thumbs.db", "desktop.ini",
+    "ntuser.dat*", "bootmgr*", "pagefile.sys", "hiberfil.sys", "swapfile.sys"
 ]
 
 class ConfigManager:
@@ -42,6 +43,11 @@ class ConfigManager:
         self.categories: Dict[str, List[str]] = {k: list(v) for k, v in DEFAULT_CATEGORIES.items()}
         self.custom_rules: List[Dict[str, Any]] = []
         self.ignored_patterns: List[str] = list(DEFAULT_IGNORED)
+        self.theme: str = "System"  # "Light", "Dark", "System"
+        self.duplicate_strategy: str = "rename"  # "rename", "skip", "overwrite"
+        self.confirm_before_organize: bool = True
+        self.keep_history: bool = True
+        self.undo_retention_days: int = 30
 
         # Pre-indexed extension lookup table for fast classification
         self.extension_lookup: Dict[str, str] = {}
@@ -68,6 +74,16 @@ class ConfigManager:
                         self.custom_rules = data["custom_rules"]
                     if "ignored_patterns" in data and isinstance(data["ignored_patterns"], list):
                         self.ignored_patterns = data["ignored_patterns"]
+                    if "theme" in data and isinstance(data["theme"], str):
+                        self.theme = data["theme"]
+                    if "duplicate_strategy" in data and isinstance(data["duplicate_strategy"], str):
+                        self.duplicate_strategy = data["duplicate_strategy"]
+                    if "confirm_before_organize" in data and isinstance(data["confirm_before_organize"], bool):
+                        self.confirm_before_organize = data["confirm_before_organize"]
+                    if "keep_history" in data and isinstance(data["keep_history"], bool):
+                        self.keep_history = data["keep_history"]
+                    if "undo_retention_days" in data:
+                        self.undo_retention_days = data["undo_retention_days"]
             except Exception:
                 pass
         self._build_lookup()
@@ -77,7 +93,12 @@ class ConfigManager:
         data = {
             "categories": self.categories,
             "custom_rules": self.custom_rules,
-            "ignored_patterns": self.ignored_patterns
+            "ignored_patterns": self.ignored_patterns,
+            "theme": self.theme,
+            "duplicate_strategy": self.duplicate_strategy,
+            "confirm_before_organize": self.confirm_before_organize,
+            "keep_history": self.keep_history,
+            "undo_retention_days": getattr(self, "undo_retention_days", 30),
         }
         with open(self.config_path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
@@ -89,5 +110,10 @@ class ConfigManager:
             "custom_rules_count": len(self.custom_rules),
             "ignored_patterns": self.ignored_patterns,
             "categories": self.categories,
-            "custom_rules": self.custom_rules
+            "custom_rules": self.custom_rules,
+            "theme": self.theme,
+            "duplicate_strategy": self.duplicate_strategy,
+            "confirm_before_organize": self.confirm_before_organize,
+            "keep_history": self.keep_history,
+            "undo_retention_days": getattr(self, "undo_retention_days", 30),
         }

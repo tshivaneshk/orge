@@ -35,6 +35,7 @@ Name: "addtopath"; Description: "Add ORGE CLI to system PATH environment variabl
 
 [Files]
 Source: "..\..\dist\ORGE\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\dist\orge.exe"; DestDir: "{app}"; DestName: "orge.exe"; Flags: ignoreversion
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

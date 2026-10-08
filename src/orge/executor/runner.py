@@ -5,7 +5,7 @@ Uses pure Python APIs (shutil, pathlib) — zero external shell commands.
 """
 from pathlib import Path
 import shutil
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Callable
 from orge.core.models import OperationPlan, HistoryRecord
 from orge.history.journal import HistoryManager
 
@@ -15,17 +15,31 @@ class FileExecutor:
     def __init__(self, history_manager: HistoryManager):
         self.history_manager = history_manager
 
-    def execute(self, plan: OperationPlan) -> Tuple[List[Tuple[Path, Path]], List[str]]:
+    def execute(
+        self,
+        plan: OperationPlan,
+        progress_callback: Optional[Callable[[int, int, Path, Path], None]] = None
+    ) -> Tuple[List[Tuple[Path, Path]], List[str]]:
         """
         Executes moves strictly according to the validated plan.
+        progress_callback: Optional callback receiving (completed_count, total_count, current_src, current_dst)
         Returns: (successful_moves, errors)
         """
         successful_moves: List[Tuple[Path, Path]] = []
         errors: List[str] = []
+        total_steps = len(plan.executable_steps)
+        step_idx = 0
 
         for step in plan.executable_steps:
+            step_idx += 1
             src = step.source_path
             dst = step.target_path
+
+            if progress_callback:
+                try:
+                    progress_callback(step_idx, total_steps, src, dst)
+                except Exception:
+                    pass
 
             # Guard against sudden disappearance or race condition
             if not src.exists():
@@ -51,8 +65,9 @@ class FileExecutor:
                 errors.append(f"Error moving '{src.name}' -> '{dst}': {err}")
 
         # Record in history journal
+        self.last_executed_record: Optional[HistoryRecord] = None
         if successful_moves:
-            self.history_manager.record_run(plan.target_folder, successful_moves)
+            self.last_executed_record = self.history_manager.record_run(plan.target_folder, successful_moves)
 
         return successful_moves, errors
 

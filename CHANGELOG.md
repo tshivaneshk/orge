@@ -37,5 +37,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Modern `pyproject.toml` packaging.
 
 ### Removed
-- Legacy prototype Bash scripts (`dirtx.sh`, `setup.sh`).
+- Legacy prototype shell scripts.
 - Obsolete package namespace and hardcoded scripts.

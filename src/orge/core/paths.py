@@ -5,6 +5,7 @@ Complies with XDG specifications on Linux/macOS and Known Folders on Windows.
 import os
 import sys
 from pathlib import Path
+from typing import Set
 
 def get_config_dir() -> Path:
     """
@@ -55,3 +56,31 @@ def get_history_dir() -> Path:
 def get_default_config_path() -> Path:
     """Returns path to the default config.json file."""
     return get_config_dir() / "config.json"
+
+def get_app_install_dir() -> Path:
+    """
+    Returns the directory where ORGE binary or package is installed / running from.
+    Handles PyInstaller frozen environments (sys._MEIPASS or sys.executable dir)
+    as well as source tree root.
+    """
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).resolve().parent
+    # If running from source tree, repository / package root
+    return Path(__file__).resolve().parent.parent.parent.parent
+
+def get_runtime_protected_paths() -> Set[Path]:
+    """Returns critical paths belonging to ORGE itself (install dir, config dir, data dir)."""
+    paths = set()
+    try:
+        paths.add(get_app_install_dir().resolve())
+    except Exception:
+        pass
+    try:
+        paths.add(get_config_dir().resolve())
+    except Exception:
+        pass
+    try:
+        paths.add(get_data_dir().resolve())
+    except Exception:
+        pass
+    return paths

@@ -102,18 +102,14 @@ class TestSafetyAndEdgeCases(unittest.TestCase):
         self.assertTrue(f.exists())
 
     def test_gui_instantiation(self):
-        # In headless Linux CI runners without an X11 server ($DISPLAY), creating a Tk window raises TclError
-        if sys.platform.startswith("linux") and not os.environ.get("DISPLAY"):
-            # Verify module imports and class attributes are intact without display server
-            from orge.gui.app import OrgeGUI
-            self.assertTrue(hasattr(OrgeGUI, "_init_ui"))
-            return
-
+        from PySide6.QtWidgets import QApplication
         from orge.gui.app import OrgeGUI
-        app = OrgeGUI()
-        self.assertIsNotNone(app)
-        app.withdraw()
-        app.destroy()
+
+        qapp = QApplication.instance() or QApplication([])
+        win = OrgeGUI()
+        self.assertIsNotNone(win)
+        self.assertGreater(win.stack.count(), 0)
+        win.close()
 
 if __name__ == "__main__":
     unittest.main()
