@@ -34,7 +34,7 @@ from orge.cli.main import main
 class TestORGEPipeline(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
-        self.test_root = Path(self.temp_dir.name)
+        self.test_root = Path(self.temp_dir.name).resolve()
 
         # Isolated configuration and history
         self.config_file = self.test_root / "config.json"

@@ -5,6 +5,21 @@ All notable changes to **ORGE** will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-10-08
+
+### Added
+- Native cross-platform Desktop GUI (`orge gui`) built with Tkinter/ttk sharing the identical core pipeline.
+- Standalone standalone application builds powered by PyInstaller (zero Python requirement for end users).
+- Windows Inno Setup installer script (`packaging/windows/installer.iss`) creating Start Menu shortcuts and PATH integration.
+- Windows portable bundle (`ORGE-Portable-2.1.0.zip`).
+- Cross-platform release automation for Linux (`.tar.gz`), macOS (`.tar.gz`), and Windows (`.exe` installer & `.zip`).
+- Automated SHA256 checksum generation across all release assets.
+- Expanded safety & edge-case test suite (`tests/test_safety.py`).
+
+### Fixed
+- Cross-platform path normalization in CI test discovery: resolved symlinked/canonical temporary path comparison failures on macOS (`/private/var/folders` vs `/var/folders`) and Windows 8.3 short paths (`RUNNER~1`).
+- Supported Python runtime matrix focused on active modern releases: Python 3.10, 3.11, 3.12, 3.13.
+
 ## [2.0.0] - 2026-10-08
 
 ### Added
@@ -20,7 +35,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Commands: `organize`, `preview`, `scan`, `undo`, `history`, `config`, `doctor`.
 - Automated test suite with standard `python -m unittest discover` support.
 - Modern `pyproject.toml` packaging.
-- GitHub Actions CI workflow supporting Ubuntu, Windows, and macOS matrices.
 
 ### Removed
 - Legacy prototype Bash scripts (`dirtx.sh`, `setup.sh`).

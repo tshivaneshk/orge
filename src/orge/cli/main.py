@@ -92,6 +92,9 @@ def create_parser() -> argparse.ArgumentParser:
     # Command: doctor
     subparsers.add_parser("doctor", parents=[parent_parser], help="Inspect environment health, permissions, and paths")
 
+    # Command: gui
+    subparsers.add_parser("gui", parents=[parent_parser], help="Launch the ORGE desktop graphical user interface")
+
     # Backward compatibility top-level flags (e.g. orge -f <path> --dry-run)
     parser.add_argument("-f", "--folder", type=str, default=None, help="Target folder (legacy flag)")
     parser.add_argument("-d", "--days", type=int, default=0, help="Days threshold (legacy flag)")
@@ -122,6 +125,11 @@ def main(args: Optional[list] = None) -> int:
 
     if parsed.history or parsed.command == "history":
         return cmd_history(history, parsed, ui)
+
+    if parsed.command == "gui":
+        from orge.gui.app import main as gui_main
+        gui_main()
+        return 0
 
     if parsed.command == "doctor":
         return cmd_doctor(config, ui, parsed.json)

@@ -2,74 +2,41 @@
 
 [![CI](https://github.com/tshivaneshk/orge/actions/workflows/ci.yml/badge.svg)](https://github.com/tshivaneshk/orge/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Python: 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Python: 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 
-**ORGE** is a modern, high-safety, cross-platform file organization engine. Built from the ground up for deterministic execution, ORGE classifies, stages, validates, and reorganizes filesystem directories with rollback capability.
+**ORGE** is a modern, high-safety, cross-platform file organization engine and desktop application. Built from the ground up for deterministic execution, ORGE classifies, stages, validates, and reorganizes filesystem directories with complete rollback capability.
 
 > *Historical Note: ORGE evolved from the original dirtx prototype.*
 
 ---
 
-## Architecture: ORGE
+## User Installation (No Python Required)
 
-```text
-                    ORGE
-                     │
-              ┌──────┴──────┐
-              │   CLI / UI  │
-              └──────┬──────┘
-                     │
-              ┌──────▼──────┐
-              │   Planner   │
-              └──────┬──────┘
-                     │
-          ┌──────────▼──────────┐
-          │     Classifier      │
-          └──────────┬──────────┘
-                     │
-       ┌─────────────┼─────────────┐
-       ▼             ▼             ▼
-   Extension      Metadata      Config
-   Detection      Detection      Rules
-       │             │             │
-       └─────────────┼─────────────┘
-                     ▼
-             Operation Plan
-                     │
-             ┌───────▼───────┐
-             │    Safety     │
-             │  Validation   │
-             └───────┬───────┘
-                     ▼
-              File Executor
-                │       │
-                ▼       ▼
-             History   Undo
-```
+End users do not need Python installed to use ORGE. Standalone executables, desktop bundles, and installers are provided for all major operating systems.
 
-### Pipeline Breakdown
-1. **CLI / UI**: Modern subcommand interface (`organize`, `scan`, `preview`, `undo`, `history`, `config`, `doctor`) with pure JSON mode and ANSI table presentation.
-2. **Planner**: Analyzes directory state and deterministically calculates the target destination paths (resolving any name collisions during planning so that dry-run matches real execution 100%).
-3. **Classifier**: Triple-tier classification engine:
-   - **Config Rules**: Custom user rules matching via regex (`^INV-.*\.pdf$`), glob (`*.log`), or file size thresholds.
-   - **Extension Detection**: Fast $O(1)$ lookup table for common document, media, archive, installer, and code types.
-   - **Metadata Detection**: MIME-type heuristics and file timestamps.
-   - **Misc Fallback**: Safely catches unclassified items.
-4. **Operation Plan**: In-memory staging of executable moves and skipped actions.
-5. **Safety Validation**: Eight-point safety check guarding against path traversal, symlinks/reparse points, system directories (`C:\Windows`, `/etc`, drive roots), and destination overwrites.
-6. **File Executor**: Atomic moves executed purely through Python standard library APIs (`shutil`, `pathlib`) — no fragile shell scripts.
-7. **History & Undo**: Complete journal of operations. If an undo encounters an external conflict, it preserves pending actions in the journal so rollbacks can be safely retried without data loss.
+### Windows
+- **Installer**: Download `ORGE-Setup-2.1.0.exe` from [Releases](https://github.com/tshivaneshk/orge/releases). Installs the Desktop GUI, creates Start Menu shortcuts, and adds `orge` to your system PATH.
+- **Portable**: Download and extract `ORGE-Portable-2.1.0.zip` to run anywhere without administrative privileges.
+
+### Linux
+- Download `orge-2.1.0-linux-x64.tar.gz` from [Releases](https://github.com/tshivaneshk/orge/releases).
+- Extract and run `./orge gui` or `./orge --help`.
+
+### macOS
+- Download `orge-2.1.0-macos.tar.gz` from [Releases](https://github.com/tshivaneshk/orge/releases).
+- Extract and launch `./orge gui` or `./orge --help`.
 
 ---
 
-## Installation
+## Developer Installation (Python Package)
 
-### Using pip
+Developers and power users can install ORGE directly via pip:
+
 ```bash
 pip install orge
 ```
 
-### From Source (Editable Mode)
+Or from source in editable mode:
 ```bash
 git clone https://github.com/tshivaneshk/orge.git
 cd orge
@@ -78,10 +45,58 @@ pip install -e .
 
 ---
 
+## Desktop GUI
+
+Launch the graphical user interface by running:
+```bash
+orge gui
+```
+Features:
+- Select target directory with visual folder picker.
+- Live scan & preview displaying categorized file trees.
+- Safety error reporting before any disk modifications.
+- Interactive run history browser and one-click undo rollback.
+
+---
+
+## Architecture: ORGE
+
+```text
+                  ORGE CORE
+                      |
+        +-------------+-------------+
+        |                           |
+       CLI                         GUI
+        |                           |
+        +-------------+-------------+
+                      |
+               Shared Services
+                      |
+       +--------------+--------------+
+       |              |              |
+    Planner       Safety         Executor
+       |              |              |
+    Classifier      History      Config
+```
+
+### Pipeline Breakdown
+1. **CLI & GUI**: Dual interface sharing the identical core engine.
+2. **Planner**: Analyzes directory state and deterministically calculates target paths. Pre-resolves collisions upfront so dry-run preview matches real execution 100%.
+3. **Classifier**: Triple-tier classification engine:
+   - **Config Rules**: Custom regex (`^INV-.*\.pdf$`), glob (`*.log`), or file size constraints.
+   - **Extension Detection**: Fast $O(1)$ lookup hash tables for code, media, documents, and archives.
+   - **Metadata Detection**: MIME-type heuristics and file timestamps.
+   - **Misc Fallback**: Safely catches unclassified items.
+4. **Safety Validation**: Multi-stage safety pipeline preventing path traversal, system directory tampering (`C:\Windows`, `/etc`, drive roots), and destination overwrites.
+5. **File Executor**: Moves files using standard library filesystem APIs (`shutil`, `pathlib`).
+6. **History & Undo**: Persistent JSON journaling. Preserves pending records under partial failures so rollbacks can be safely retried without data loss.
+
+---
+
 ## CLI Usage
 
 ### 1. Preview Before Moving (Dry-Run)
-Inspect what will happen without touching any files:
+Inspect planned operations without touching any files:
 ```bash
 orge preview ~/Downloads
 # or
@@ -92,42 +107,47 @@ orge organize ~/Downloads --dry-run
 ```bash
 orge organize ~/Downloads
 ```
-Skip the confirmation prompt:
+Skip interactive confirmation:
 ```bash
 orge organize ~/Downloads -y
 ```
 
-### 3. Scan a Directory
-Get a categorized inventory of files and counts:
+### 3. Launch Desktop GUI
+```bash
+orge gui
+```
+
+### 4. Scan Directory
+Print categorized file counts and disk usage:
 ```bash
 orge scan ~/Downloads
 ```
 
-### 4. Rollback / Undo
+### 5. Rollback / Undo
 Reverse the most recent organization operation:
 ```bash
 orge undo
 ```
 
-### 5. View History
+### 6. View History
 ```bash
 orge history
 ```
 
-### 6. Filter by File Age
+### 7. Filter by File Age
 Only organize files modified more than 14 days ago:
 ```bash
 orge organize ~/Downloads -d 14
 ```
 
-### 7. JSON Output Mode
+### 8. JSON Output Mode
 For scripting, automation, or integration:
 ```bash
 orge organize ~/Downloads --dry-run --json
 orge scan ~/Downloads --json
 ```
 
-### 8. System Diagnostics
+### 9. System Diagnostics
 Inspect platform-specific configuration and journal directories:
 ```bash
 orge doctor
