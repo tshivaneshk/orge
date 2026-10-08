@@ -102,8 +102,11 @@ class TestSafetyAndEdgeCases(unittest.TestCase):
         self.assertTrue(f.exists())
 
     def test_gui_instantiation(self):
-        from PySide6.QtWidgets import QApplication
-        from orge.gui.app import OrgeGUI
+        try:
+            from PySide6.QtWidgets import QApplication
+            from orge.gui.app import OrgeGUI
+        except (ImportError, ModuleNotFoundError):
+            raise unittest.SkipTest("PySide6 not installed on this platform")
 
         qapp = QApplication.instance() or QApplication([])
         win = OrgeGUI()

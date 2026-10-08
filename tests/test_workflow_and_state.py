@@ -5,15 +5,22 @@ import unittest
 import tempfile
 import shutil
 from pathlib import Path
-from PySide6.QtWidgets import QApplication
+
+try:
+    from PySide6.QtWidgets import QApplication
+    from orge.gui.adapter import EngineAdapter
+    from orge.gui.shell import MainWindowShell, AppWorkflowState
+    HAS_PYSIDE6 = True
+except (ImportError, ModuleNotFoundError):
+    HAS_PYSIDE6 = False
 
 from orge.config.manager import ConfigManager
-from orge.gui.adapter import EngineAdapter
-from orge.gui.shell import MainWindowShell, AppWorkflowState
 from orge.core.models import OperationPlan, ValidationReport
 
-app = QApplication.instance() or QApplication([])
+if HAS_PYSIDE6:
+    app = QApplication.instance() or QApplication([])
 
+@unittest.skipUnless(HAS_PYSIDE6, "PySide6 not available on this platform")
 class TestWorkflowAndState(unittest.TestCase):
     def setUp(self):
         self.temp_dir = Path(tempfile.mkdtemp())

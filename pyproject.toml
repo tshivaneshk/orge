@@ -29,9 +29,14 @@ classifiers = [
     "Topic :: Utilities",
     "Topic :: System :: Systems Administration",
 ]
-dependencies = []
+dependencies = [
+    "PySide6>=6.5.0; sys_platform == 'win32'",
+]
 
 [project.optional-dependencies]
+gui = [
+    "PySide6>=6.5.0",
+]
 dev = [
     "pytest>=7.0",
     "ruff>=0.1.0",

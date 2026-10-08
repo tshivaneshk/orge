@@ -4,8 +4,21 @@ Enforces the gradient-themed light design system.
 Safely ignores any legacy dark or system theme configuration values.
 """
 from typing import Callable, List, Optional
-from PySide6.QtCore import QObject, Signal
-from PySide6.QtWidgets import QApplication
+
+try:
+    from PySide6.QtCore import QObject, Signal
+    from PySide6.QtWidgets import QApplication
+    HAS_QT = True
+except (ImportError, ModuleNotFoundError):
+    HAS_QT = False
+    class QObject:
+        def __init__(self, *args, **kwargs):
+            pass
+    def Signal(*args, **kwargs):
+        class DummySignal:
+            def connect(self, *a, **k): pass
+            def emit(self, *a, **k): pass
+        return DummySignal()
 
 from orge.gui.tokens import Palette, LIGHT_PALETTE
 
