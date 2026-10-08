@@ -4,10 +4,10 @@
 
 The following versions of **ORGE** are currently supported with security updates:
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 2.0.x   | :white_check_mark: |
-| < 2.0.0 | :x:                |
+| Version | Supported |
+| ------- | --------- |
+| 2.0.x   | Yes       |
+| < 2.0.0 | No        |
 
 ## Reporting a Vulnerability
 

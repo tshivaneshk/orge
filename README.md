@@ -10,7 +10,7 @@
 
 ---
 
-## 📐 Architecture: ORGE
+## Architecture: ORGE
 
 ```text
                     ORGE
@@ -62,7 +62,7 @@
 
 ---
 
-## 🚀 Installation
+## Installation
 
 ### Using pip
 ```bash
@@ -78,7 +78,7 @@ pip install -e .
 
 ---
 
-## 💻 CLI Usage
+## CLI Usage
 
 ### 1. Preview Before Moving (Dry-Run)
 Inspect what will happen without touching any files:
@@ -135,7 +135,7 @@ orge doctor
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 ORGE respects standard cross-platform conventions:
 - **Windows**: `%APPDATA%\orge\config.json`
@@ -175,7 +175,7 @@ Example `config.json`:
 
 ---
 
-## 🧪 Testing
+## Testing
 
 Execute test discovery across all components:
 ```bash
@@ -184,6 +184,6 @@ python -m unittest discover -v -s tests
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
