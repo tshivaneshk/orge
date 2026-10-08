@@ -15,8 +15,8 @@
 End users do not need Python installed to use ORGE. Standalone executables, desktop bundles, and installers are provided for all major operating systems.
 
 ### Windows
-- **Installer**: Download `ORGE-Setup-2.1.0.exe` from [Releases](https://github.com/tshivaneshk/orge/releases). Installs the Desktop GUI, creates Start Menu shortcuts, and adds `orge` to your system PATH.
-- **Portable**: Download and extract `ORGE-Portable-2.1.0.zip` to run anywhere without administrative privileges.
+- **Installer**: Download `ORGE-Setup-2.1.0.exe` from [Releases](https://github.com/tshivaneshk/orge/releases). Installs `ORGE.exe` (windowed GUI without any console shell), creates Start Menu / Desktop shortcuts, and registers `orge.exe` (CLI) in your system PATH.
+- **Portable**: Download and extract `ORGE-Portable-2.1.0.zip`. Run `ORGE.exe` for the GUI or run `orge.exe` from any terminal.
 
 ### Linux
 - Download `orge-2.1.0-linux-x64.tar.gz` from [Releases](https://github.com/tshivaneshk/orge/releases).

@@ -51,15 +51,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller hatchling
 
-      - name: Build standalone executable
+      - name: Build standalone executables (GUI and CLI)
+        shell: pwsh
         run: |
-          python -m PyInstaller --clean --noconfirm --onedir --name orge --paths src src/orge/__main__.py
+          python -m PyInstaller --clean --noconfirm --onedir --noconsole --name ORGE --paths src src/orge/gui/__main__.py
+          python -m PyInstaller --clean --noconfirm --onedir --console --name orge-cli --paths src src/orge/__main__.py
+          Copy-Item dist/orge-cli/orge-cli.exe dist/ORGE/orge.exe -Force
 
       - name: Create Portable Zip
         shell: pwsh
         run: |
           $ver = "${{ github.ref_name }}".TrimStart("v")
-          Compress-Archive -Path dist/orge/* -DestinationPath "dist/ORGE-Portable-${ver}.zip" -Force
+          Compress-Archive -Path dist/ORGE/* -DestinationPath "dist/ORGE-Portable-${ver}.zip" -Force
 
       - name: Install Inno Setup
         shell: pwsh

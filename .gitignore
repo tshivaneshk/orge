@@ -7,8 +7,10 @@ __pycache__/
 # Distribution and packaging
 build/
 dist/
+dist-installer/
 *.egg-info/
 .eggs/
+*.spec
 
 # Environments
 .venv/
