@@ -1,0 +1,42 @@
+name: Bug Report
+description: Create a report to help us improve ORGE
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for reporting an issue! Please describe the problem in detail.
+  - type: input
+    id: version
+    attributes:
+      label: ORGE Version
+      description: Run `orge doctor --json` or `orge --version`
+      placeholder: "2.0.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      options:
+        - Windows 10/11
+        - Linux (Ubuntu / Debian / Fedora / Arch)
+        - macOS
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the Bug
+      description: A clear and concise description of what happened.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to Reproduce
+      placeholder: |
+        1. Run `orge organize ~/test-folder`
+        2. Expected behavior: ...
+        3. Observed behavior: ...
+    validations:
+      required: true
