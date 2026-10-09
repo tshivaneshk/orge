@@ -64,6 +64,9 @@ def build_python_packages():
     log("Python packages built successfully in dist/")
 
 def build_windows_binaries():
+    app_ico = ROOT_DIR / "packaging" / "windows" / "app.ico"
+    logo_png = ROOT_DIR / "src" / "orge" / "gui" / "assets" / "logo.png"
+
     log("Compiling Windows GUI application (ORGE.exe) with PyInstaller (--onedir --noconsole)...")
     gui_cmd = [
         sys.executable, "-m", "PyInstaller",
@@ -71,9 +74,26 @@ def build_windows_binaries():
         "--onedir", "--noconsole",
         "--name", "ORGE",
         "--paths", "src",
-        "src/orge/gui/__main__.py"
+        "--collect-all", "PySide6",
     ]
+    if app_ico.exists():
+        gui_cmd.extend(["--icon", str(app_ico)])
+    if logo_png.exists():
+        gui_cmd.extend(["--add-data", f"{logo_png};orge/gui/assets"])
+
+    gui_cmd.append("src/orge/gui/__main__.py")
     subprocess.run(gui_cmd, cwd=str(ROOT_DIR), check=True)
+
+    # Ensure dist/ORGE/assets and dist/ORGE/_internal/orge/gui/assets have logo.png
+    if logo_png.exists():
+        target_asset_dir1 = DIST_DIR / "ORGE" / "assets"
+        target_asset_dir1.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(logo_png, target_asset_dir1 / "logo.png")
+
+        target_asset_dir2 = DIST_DIR / "ORGE" / "_internal" / "orge" / "gui" / "assets"
+        target_asset_dir2.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(logo_png, target_asset_dir2 / "logo.png")
+        log(f"Bundled application logo into GUI distribution directories.")
 
     # Ensure dist/ORGE/ORGE.exe has the authentic GUI binary from build/ORGE/ORGE.exe
     src_gui_exe = BUILD_DIR / "ORGE" / "ORGE.exe"
@@ -89,8 +109,11 @@ def build_windows_binaries():
         "--onefile", "--console",
         "--name", "orge",
         "--paths", "src",
-        "src/orge/__main__.py"
     ]
+    if app_ico.exists():
+        cli_cmd.extend(["--icon", str(app_ico)])
+
+    cli_cmd.append("src/orge/__main__.py")
     subprocess.run(cli_cmd, cwd=str(ROOT_DIR), check=True)
     log("Standalone CLI binary built at dist/orge.exe")
 
@@ -150,9 +173,9 @@ def create_portable_zip():
                 full_path = Path(root) / file
                 arcname = full_path.relative_to(orge_dir)
                 zf.write(full_path, arcname)
-        # Include orge.exe in the portable root
+        # Include standalone CLI inside bin/orge.exe to prevent NTFS case collision with root ORGE.exe
         if root_cli.exists():
-            zf.write(root_cli, "orge.exe")
+            zf.write(root_cli, "bin/orge.exe")
 
     log(f"✓ Created portable zip: {zip_path} ({zip_path.stat().st_size:,} bytes)")
 

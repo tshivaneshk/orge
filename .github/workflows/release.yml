@@ -49,21 +49,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pyinstaller hatchling
-
-      - name: Build standalone executables (GUI and CLI)
-        shell: pwsh
-        run: |
-          python -m PyInstaller --clean --noconfirm --onedir --noconsole --name ORGE --paths src src/orge/gui/__main__.py
-          python -m PyInstaller --clean --noconfirm --onefile --console --name orge --paths src src/orge/__main__.py
-          Copy-Item dist/orge.exe dist/ORGE/orge.exe -Force
-          Copy-Item dist/orge.exe dist/ORGE/orge-cli.exe -Force
-
-      - name: Create Portable Zip
-        shell: pwsh
-        run: |
-          $ver = "${{ github.ref_name }}".TrimStart("v")
-          Compress-Archive -Path dist/ORGE/* -DestinationPath "dist/ORGE-Portable-${ver}.zip" -Force
+          pip install pyinstaller hatchling pyside6 pillow pefile build
 
       - name: Install Inno Setup
         shell: pwsh
@@ -71,9 +57,10 @@ jobs:
           choco install innosetup --no-progress
           echo "C:\Program Files (x86)\Inno Setup 6" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
-      - name: Compile Inno Setup Script
+      - name: Build Windows Standalone, Portable Package, and Installer
+        shell: pwsh
         run: |
-          iscc packaging/windows/installer.iss
+          python packaging/build.py
 
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4

@@ -8,6 +8,7 @@ __pycache__/
 build/
 dist/
 dist-installer/
+release-test/
 *.egg-info/
 .eggs/
 *.spec

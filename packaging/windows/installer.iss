@@ -21,41 +21,67 @@ DisableProgramGroupPage=yes
 LicenseFile=..\..\LICENSE
 OutputDir=..\..\dist-installer
 OutputBaseFilename=ORGE-Setup-{#MyAppVersion}
+SetupIconFile=app.ico
+UninstallDisplayIcon={app}\{#MyAppExeName}
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
 ChangesEnvironment=yes
+PrivilegesRequired=lowest
+PrivilegesRequiredOverridesAllowed=dialog
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
-Name: "addtopath"; Description: "Add ORGE CLI to system PATH environment variable"; GroupDescription: "System Integration:"
+Name: "addtopath"; Description: "Add ORGE CLI to user/system PATH environment variable"; GroupDescription: "System Integration:"
 
 [Files]
-Source: "..\..\dist\ORGE\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\..\dist\orge.exe"; DestDir: "{app}"; DestName: "orge.exe"; Flags: ignoreversion
+Source: "..\..\dist\ORGE\ORGE.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\dist\ORGE\orge-cli.exe"; DestDir: "{app}"; DestName: "orge-cli.exe"; Flags: ignoreversion
+Source: "..\..\dist\orge.exe"; DestDir: "{app}\bin"; DestName: "orge.exe"; Flags: ignoreversion
+Source: "..\..\dist\ORGE\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "ORGE.exe,orge.exe,orge-cli.exe"
 
 [Icons]
-Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\{#MyAppExeName}"
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [Registry]
+; If elevated to admin, update System PATH (HKLM) with {app}\bin
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; \
-    ValueType: expandsz; ValueName: "Path"; ValueData: "{olddata};{app}"; \
-    Tasks: addtopath; Check: NeedsAddPath(ExpandConstant('{app}'))
+    ValueType: expandsz; ValueName: "Path"; ValueData: "{olddata};{app}\bin;{app}"; \
+    Tasks: addtopath; Check: IsAdminInstallMode and NeedsAddPathHKLM(ExpandConstant('{app}\bin'))
+
+; If installed as regular user, update User PATH (HKCU) with {app}\bin
+Root: HKCU; Subkey: "Environment"; \
+    ValueType: expandsz; ValueName: "Path"; ValueData: "{olddata};{app}\bin;{app}"; \
+    Tasks: addtopath; Check: (not IsAdminInstallMode) and NeedsAddPathHKCU(ExpandConstant('{app}\bin'))
 
 [Code]
-function NeedsAddPath(Param: string): boolean;
+function NeedsAddPathHKLM(Param: string): boolean;
 var
   OrigPath: string;
 begin
   if not RegQueryStringValue(HKEY_LOCAL_MACHINE,
     'SYSTEM\CurrentControlSet\Control\Session Manager\Environment',
+    'Path', OrigPath)
+  then begin
+    Result := True;
+    exit;
+  end;
+  Result := Pos(';' + Param + ';', ';' + OrigPath + ';') = 0;
+end;
+
+function NeedsAddPathHKCU(Param: string): boolean;
+var
+  OrigPath: string;
+begin
+  if not RegQueryStringValue(HKEY_CURRENT_USER,
+    'Environment',
     'Path', OrigPath)
   then begin
     Result := True;

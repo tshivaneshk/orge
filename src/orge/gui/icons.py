@@ -82,12 +82,34 @@ def get_logo_pixmap(size: int = 96) -> QPixmap:
     """
     Returns the cached high-resolution ORGE application logo scaled to requested size.
     Decoded once and cached in-memory for instant rendering.
+    Supports development source trees and PyInstaller frozen bundles.
     """
     global _LOGO_PIXMAP
     if _LOGO_PIXMAP is None or _LOGO_PIXMAP.isNull():
-        logo_path = Path(__file__).resolve().parent / "assets" / "logo.png"
-        if logo_path.exists():
-            _LOGO_PIXMAP = QPixmap(str(logo_path))
+        # Check standard and frozen bundle candidate locations
+        candidates = [
+            Path(__file__).resolve().parent / "assets" / "logo.png",
+        ]
+        import sys
+        if getattr(sys, "frozen", False):
+            base_dir = Path(getattr(sys, "_MEIPASS", sys.executable)).resolve()
+            if base_dir.is_file():
+                base_dir = base_dir.parent
+            candidates.extend([
+                base_dir / "orge" / "gui" / "assets" / "logo.png",
+                base_dir / "_internal" / "orge" / "gui" / "assets" / "logo.png",
+                base_dir / "assets" / "logo.png",
+                base_dir / "_internal" / "assets" / "logo.png",
+            ])
+
+        found_path = None
+        for cand in candidates:
+            if cand.exists():
+                found_path = cand
+                break
+
+        if found_path:
+            _LOGO_PIXMAP = QPixmap(str(found_path))
         else:
             _LOGO_PIXMAP = get_pixmap("folder", "#0B7A6A", size)
 
